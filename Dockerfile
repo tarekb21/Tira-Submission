@@ -1,18 +1,22 @@
-# Use a slim Python base
+# Use a slim Python image
 FROM python:3.11-slim
 
-# Set working directory
+# Set working dir
 WORKDIR /app
 
-# Install your Python dependencies
+# Copy & install dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy in all your code & notebooks
+# Copy in your code, the notebook, and our run.sh
 COPY . .
 
-# Install papermill so we can execute the notebook
-RUN pip install --no-cache-dir papermill
+# Install papermill, kernels, nbformat
+RUN pip install --no-cache-dir papermill ipykernel nbformat
 
-# When the container runs, execute baseline.ipynb → output.ipynb
-ENTRYPOINT ["papermill", "baseline.ipynb", "output.ipynb"]
+# Register a 'python3' kernel so papermill can find it
+RUN python -m ipykernel install --user --name python3 --display-name python3
+
+# Make run.sh executable and use it as the container entrypoint
+RUN chmod +x run.sh
+ENTRYPOINT ["./run.sh"]
