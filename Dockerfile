@@ -1,29 +1,22 @@
-# Use a slim Python base
-FROM python:3.11-slim
+# A prepared image with Python 3.10, Java 11, ir_datasets, TIRA, and PyTerrier pre-installed
+FROM webis/ir-lab-wise-2023:0.0.4
 
-# 1. Install system deps so pip can fetch git-based packages
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
-         git \
-         build-essential \
-    && rm -rf /var/lib/apt/lists/*
+# Update TIRA CLI to the latest version
+RUN pip3 uninstall -y tira \
+    && pip3 install --no-cache-dir tira
 
-# 2. Set working directory
+# Set working directory
 WORKDIR /app
 
-# 3. Copy & install Python dependencies
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# Copy all project files into the container
+COPY . /app
 
-# 4. Copy in your code, notebook, and run.sh
-COPY . .
+# Install notebook execution and kernel support
+RUN pip3 install --no-cache-dir papermill ipykernel nbformat
 
-# 5. Install papermill, kernel support, and nbformat
-RUN pip install --no-cache-dir papermill ipykernel nbformat
+# Register a 'python3' Jupyter kernel for papermill
+RUN python3 -m ipykernel install --user --name python3 --display-name python3
 
-# 6. Register a 'python3' kernel for papermill
-RUN python -m ipykernel install --user --name python3 --display-name python3
-
-# 7. Make your run.sh executable and use it as entrypoint
+# Ensure run.sh is executable and set it as entrypoint
 RUN chmod +x run.sh
 ENTRYPOINT ["./run.sh"]
