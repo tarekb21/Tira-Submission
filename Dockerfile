@@ -1,22 +1,13 @@
-# A prepared image with Python 3.10, Java 11, ir_datasets, TIRA, and PyTerrier pre-installed
+# 1) Base image with Python, Java, TIRA CLI, etc.
 FROM webis/ir-lab-wise-2023:0.0.4
 
-# Update TIRA CLI to the latest version
-RUN pip3 uninstall -y tira \
-    && pip3 install --no-cache-dir tira
+# 2) Copy & install your minimal Python deps
+COPY requirements.txt /app/requirements.txt
+RUN pip3 install --no-cache-dir -r /app/requirements.txt
 
-# Set working directory
+# 3) Put code + model into /app
 WORKDIR /app
+COPY train.py predict.py model.joblib /app/
 
-# Copy all project files into the container
-COPY . /app
-
-# Install notebook execution and kernel support
-RUN pip3 install --no-cache-dir papermill ipykernel nbformat
-
-# Register a 'python3' Jupyter kernel for papermill
-RUN python3 -m ipykernel install --user --name python3 --display-name python3
-
-# Ensure run.sh is executable and set it as entrypoint
-RUN chmod +x run.sh
-ENTRYPOINT ["./run.sh"]
+# 4) By default, run the predictor
+ENTRYPOINT ["/app/predict.py"]
