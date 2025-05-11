@@ -29,8 +29,8 @@ def load_dataset(responses_path, labels_path):
     return ids, texts, labels
 
 # TIRA mounts your chosen dataset under /app/data
-TRAIN_R = "/Users/tarekbouhairi/Desktop/my_submission/Dataset/responses-train.jsonl"
-TRAIN_L = "/Users/tarekbouhairi/Desktop/my_submission/Dataset/responses-train-labels.jsonl"
+TRAIN_R = "my_submission/Dataset/responses-train.jsonl"
+TRAIN_L = "my_submission/Dataset/responses-train-labels.jsonl"
 
 # load & train
 train_ids, train_texts, train_labels = load_dataset(TRAIN_R, TRAIN_L)
