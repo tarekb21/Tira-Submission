@@ -1,4 +1,0 @@
-tira>=0.0.159
-scikit-learn>=1.2
-click
-joblib
