@@ -26,6 +26,5 @@ jobs:
     - name: Push to TIRA
       run: |
         tira-run \
-            --input-dataset --input-dataset ads-in-rag-task-2-classification-spot-check \
+            --input-dataset --input-dataset ads-in-rag-task-2-classification-spot-check \ 
             --image registry.webis.de/code-research/tira/tira-user-pirate-passau/tira-submission:0.0.1
-
