@@ -34,7 +34,7 @@ def main(input_dir, output_dir):
     train_labels_file = os.path.join(input_dir, 'responses-train-labels.jsonl')
     val_responses_file   = os.path.join(input_dir, 'responses-validation.jsonl')
     val_labels_file      = os.path.join(input_dir, 'responses-validation-labels.jsonl')
-    test_responses_file  = os.path.join(input_dir, 'responses-test.jsonl')
+    test_responses_file  = os.path.join(input_dir, 'ads-in-rag-task-2-classification-spot-check.jsonl')
 
     # Load data
     train_ids, train_texts, train_labels = load_dataset(train_responses_file, train_labels_file)
