@@ -25,9 +25,11 @@ jobs:
 
     - name: Push to TIRA
       env:
-          TIRA_CLIENT_TOKEN: ${{ secrets.TIRA_CLIENT_TOKEN }}
+        TIRA_CLIENT_TOKEN: ${{ secrets.TIRA_CLIENT_TOKEN }}
       run: |
-        tira-run upload \
+        tira-run \
         --input-dataset=advertisement-in-retrieval-augmented-generation-2025/ads-in-rag-task-2-classification-spot-check \
         --image=registry.webis.de/code-research/tira/tira-user-pirate-passau/tira-submission:0.0.1 \
-        --tira-client-token=$TIRA_CLIENT_TOKEN
+        --push true \
+        --skip-local-test
+
