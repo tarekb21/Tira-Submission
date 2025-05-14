@@ -23,10 +23,12 @@ jobs:
       run: |
         docker build -t registry.webis.de/code-research/tira/tira-user-pirate-passau/tira-submission:0.0.1 -f Dockerfile .
 
-    - name: Push to TIRA
+    - name: Push Docker image to TIRA
       run: |
         tira-run \
-        --input-dataset=advertisement-in-retrieval-augmented-generation-2025/ads-in-rag-task-2-classification-spot-check \
-        --image=registry.webis.de/code-research/tira/tira-user-pirate-passau/tira-submission:0.0.1 \
-        
+          --input-dataset=advertisement-in-retrieval-augmented-generation-2025/ads-in-rag-task-2-classification-spot-check \
+          --image=registry.webis.de/code-research/tira/tira-user-pirate-passau/tira-submission:0.0.1 \
+          --push true \
+          --tira-client-token=${{ secrets.TIRA_CLIENT_TOKEN }}
+
 
