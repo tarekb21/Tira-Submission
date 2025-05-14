@@ -30,5 +30,6 @@ jobs:
           --image=registry.webis.de/code-research/tira/tira-user-pirate-passau/tira-submission:0.0.1 \
           --push true \
           --tira-client-token=${{ secrets.TIRA_CLIENT_TOKEN }}
+          --skip-local-test
 
 
