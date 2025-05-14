@@ -29,7 +29,7 @@ jobs:
           --input-dataset=advertisement-in-retrieval-augmented-generation-2025/ads-in-rag-task-2-classification-spot-check \
           --image=registry.webis.de/code-research/tira/tira-user-pirate-passau/tira-submission:0.0.1 \
           --push true \
-          --tira-client-token=${{ secrets.TIRA_CLIENT_TOKEN }}
+          --tira-client-token=${{ secrets.TIRA_CLIENT_TOKEN }} \
           --skip-local-test
 
 
