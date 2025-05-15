@@ -1,33 +1,32 @@
-import argparse
-import os
-import json
-import pandas as pd
-import numpy as np
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.linear_model import LogisticRegression
-from sklearn.pipeline import make_pipeline
-import joblib
+# import argparse
+# import os
+# import json
+# import pandas as pd
+# import numpy as np
+# from sklearn.feature_extraction.text import TfidfVectorizer
+# from sklearn.linear_model import LogisticRegression
+# from sklearn.pipeline import make_pipeline
 
-def load_dataset(responses_file, labels_file=None):
-    responses = {}
-    with open(responses_file, 'r', encoding='utf-8') as f:
-        for line in f:
-            data = json.loads(line)
-            responses[data["id"]] = data["response"]
+# def load_dataset(responses_file, labels_file=None):
+#     responses = {}
+#     with open(responses_file, 'r', encoding='utf-8') as f:
+#         for line in f:
+#             data = json.loads(line)
+#             responses[data["id"]] = data["response"]
     
-    ids = list(responses.keys())
-    texts = list(responses.values())
+#     ids = list(responses.keys())
+#     texts = list(responses.values())
     
-    labels = None
-    if labels_file:
-        labels = {}
-        with open(labels_file, 'r', encoding='utf-8') as f:
-            for line in f:
-                data = json.loads(line)
-                labels[data["id"]] = data["label"]
-        labels = [labels[i] for i in ids if i in labels]
+#     labels = None
+#     if labels_file:
+#         labels = {}
+#         with open(labels_file, 'r', encoding='utf-8') as f:
+#             for line in f:
+#                 data = json.loads(line)
+#                 labels[data["id"]] = data["label"]
+#         labels = [labels[i] for i in ids if i in labels]
     
-    return ids, texts, labels
+#     return ids, texts, labels
 
 # def main(input_dir, output_dir):
 #     # Define paths
@@ -69,40 +68,61 @@ def load_dataset(responses_file, labels_file=None):
 
 #     print(f"Done. Predictions written to {output_dir}/predictions.jsonl")
 
+
+# if __name__ == "__main__":
+#     parser = argparse.ArgumentParser()
+#     parser.add_argument("-i", "--input", required=True, help="Path to input dataset.")
+#     parser.add_argument("-o", "--output", required=True, help="Path to output directory.")
+#     args = parser.parse_args()
+#     main(args.input, args.output)
+
+
+import argparse
+import os
+import json
+import joblib
+
+def load_dataset(responses_file):
+    """Load TIRA test input JSONL (id + response)."""
+    ids, texts = [], []
+    with open(responses_file, 'r', encoding='utf-8') as f:
+        for line in f:
+            d = json.loads(line)
+            ids.append(d["id"])
+            texts.append(d["response"])
+    return ids, texts
+
 def main(input_dir, output_dir):
-    import traceback
+    # 1) Locate TIRA’s test file
+    test_path = os.path.join(input_dir, 'input.jsonl')
+    if not os.path.exists(test_path):
+        raise FileNotFoundError(f"No input.jsonl in {input_dir}")
 
-    try:
-        print("📂 Listing contents of input_dir:", os.listdir(input_dir), flush=True)
+    test_ids, test_texts = load_dataset(test_path)
 
-        test_responses_file = os.path.join(input_dir, 'input.jsonl')
-        test_ids, test_texts, _ = load_dataset(test_responses_file)
+    # 2) Load pre-trained model
+    model = joblib.load("/model.pkl")
 
-        print("✅ Loading trained model...", flush=True)
-        pipeline = joblib.load("/model.pkl")
+    # 3) Predict
+    preds = model.predict(test_texts)
 
-        predictions = pipeline.predict(test_texts)
+    # 4) Write TIRA’s required output
+    os.makedirs(output_dir, exist_ok=True)
+    out_file = os.path.join(output_dir, 'predictions.jsonl')
+    with open(out_file, 'w', encoding='utf-8') as fout:
+        for _id, p in zip(test_ids, preds):
+            fout.write(json.dumps({
+                "id": _id,
+                "label": int(p),
+                "tag": "Tf-IDF-logReg"
+            }) + "\n")
 
-        os.makedirs(output_dir, exist_ok=True)
-        with open(os.path.join(output_dir, 'predictions.jsonl'), 'w', encoding='utf-8') as f_out:
-            for instance_id, pred in zip(test_ids, predictions):
-                result = {
-                    "id": instance_id,
-                    "label": int(pred),
-                    "tag": "Tf-IDF-logReg"
-                }
-                f_out.write(json.dumps(result) + '\n')
-
-        print("✅ predictions.jsonl written successfully.", flush=True)
-
-    except Exception as e:
-        print("❌ Exception occurred:", e, flush=True)
-        traceback.print_exc()
-
+    print(f"✅ Wrote {out_file}", flush=True)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-i", "--input", required=True, help="Path to input dataset.")
+    parser.add_argument("-i", "--input",  required=True, help="Path to input dataset.")
     parser.add_argument("-o", "--output", required=True, help="Path to output directory.")
     args = parser.parse_args()
     main(args.input, args.output)
+
