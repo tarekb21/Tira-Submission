@@ -6,6 +6,7 @@ import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import make_pipeline
+import joblib
 
 def load_dataset(responses_file, labels_file=None):
     responses = {}
@@ -72,39 +73,18 @@ def main(input_dir, output_dir):
     import traceback
 
     try:
-        print("📂 Listing contents of input_dir:", input_dir)
-        print(os.listdir(input_dir))  # This shows all files TIRA passed in
+        print("📂 Listing contents of input_dir:", os.listdir(input_dir), flush=True)
 
-        # Define paths
-        train_responses_file = os.path.join(input_dir, 'responses-train.jsonl')
-        train_labels_file = os.path.join(input_dir, 'responses-train-labels.jsonl')
-        val_responses_file   = os.path.join(input_dir, 'responses-validation.jsonl')
-        val_labels_file      = os.path.join(input_dir, 'responses-validation-labels.jsonl')
-        test_responses_file  = os.path.join(input_dir, 'input.jsonl')  # TIRA default
-
-        # Load data
-        train_ids, train_texts, train_labels = load_dataset(train_responses_file, train_labels_file)
-        val_ids, val_texts, val_labels = load_dataset(val_responses_file, val_labels_file)
+        test_responses_file = os.path.join(input_dir, 'input.jsonl')
         test_ids, test_texts, _ = load_dataset(test_responses_file)
 
-        # Combine train and val
-        combined_texts = train_texts + val_texts
-        combined_labels = train_labels + val_labels
+        print("✅ Loading trained model...", flush=True)
+        pipeline = joblib.load("/model.pkl")
 
-        # Train model
-        pipeline = make_pipeline(
-            TfidfVectorizer(stop_words='english', max_df=0.95),
-            LogisticRegression(class_weight='balanced', max_iter=1000, random_state=42)
-        )
-        pipeline.fit(combined_texts, combined_labels)
-
-        # Predict
         predictions = pipeline.predict(test_texts)
 
-        # Write output
         os.makedirs(output_dir, exist_ok=True)
-        output_path = os.path.join(output_dir, 'predictions.jsonl')
-        with open(output_path, 'w', encoding='utf-8') as f_out:
+        with open(os.path.join(output_dir, 'predictions.jsonl'), 'w', encoding='utf-8') as f_out:
             for instance_id, pred in zip(test_ids, predictions):
                 result = {
                     "id": instance_id,
@@ -113,12 +93,11 @@ def main(input_dir, output_dir):
                 }
                 f_out.write(json.dumps(result) + '\n')
 
-        print(f"✅ Done. Predictions written to {output_path}")
+        print("✅ predictions.jsonl written successfully.", flush=True)
 
     except Exception as e:
-        print("❌ Exception occurred:", e)
+        print("❌ Exception occurred:", e, flush=True)
         traceback.print_exc()
-        raise
 
 
 if __name__ == "__main__":
