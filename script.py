@@ -76,14 +76,89 @@
 #     args = parser.parse_args()
 #     main(args.input, args.output)
 
+# -------------------------------------------------------------------------------
+# import argparse
+# import os
+# import json
+# import joblib
 
+# def load_dataset(responses_file):
+#     """Load TIRA test input JSONL (id + response)."""
+#     ids, texts = [], []
+#     with open(responses_file, 'r', encoding='utf-8') as f:
+#         for line in f:
+#             d = json.loads(line)
+#             ids.append(d["id"])
+#             texts.append(d["response"])
+#     return ids, texts
+
+# def find_test_file(input_dir):
+#     # Walk the entire input_dir to find input.jsonl
+#     for root, dirs, files in os.walk(input_dir):
+#         if 'input.jsonl' in files:
+#             return os.path.join(root, 'input.jsonl')
+#     raise FileNotFoundError(f"No input.jsonl found under {input_dir}")
+
+# def main(input_dir, output_dir):
+# # 1) Locate TIRA’s test file anywhere under input_dir
+#     test_path = find_test_file(input_dir)
+#     print(f"DEBUG: Using test file at {test_path}", flush=True)
+
+#     test_ids, test_texts = load_dataset(test_path)
+
+#     # 2) Load model, predict, write output as before…
+#     model = joblib.load("/model.pkl")
+#     preds = model.predict(test_texts)
+
+#     os.makedirs(output_dir, exist_ok=True)
+#     out_file = os.path.join(output_dir, 'predictions.jsonl')
+#     with open(out_file, 'w', encoding='utf-8') as fout:
+#         for _id, p in zip(test_ids, preds):
+#             fout.write(json.dumps({"id": _id, "label": int(p), "tag": "Tf-IDF-logReg"}) + "\n")
+
+#     print(f"✅ Wrote {out_file}", flush=True)
+#     # # 1) Locate TIRA’s test file
+#     # test_path = os.path.join(input_dir, 'input.jsonl')
+#     # if not os.path.exists(test_path):
+#     #     raise FileNotFoundError(f"No input.jsonl in {input_dir}")
+
+#     # test_ids, test_texts = load_dataset(test_path)
+
+#     # # 2) Load pre-trained model
+#     # model = joblib.load("/model.pkl")
+
+#     # # 3) Predict
+#     # preds = model.predict(test_texts)
+
+#     # # 4) Write TIRA’s required output
+#     # os.makedirs(output_dir, exist_ok=True)
+#     # out_file = os.path.join(output_dir, 'predictions.jsonl')
+#     # with open(out_file, 'w', encoding='utf-8') as fout:
+#     #     for _id, p in zip(test_ids, preds):
+#     #         fout.write(json.dumps({
+#     #             "id": _id,
+#     #             "label": int(p),
+#     #             "tag": "Tf-IDF-logReg"
+#     #         }) + "\n")
+
+#     # print(f"✅ Wrote {out_file}", flush=True)
+
+# if __name__ == "__main__":
+#     parser = argparse.ArgumentParser()
+#     parser.add_argument("-i", "--input",  required=True, help="Path to input dataset.")
+#     parser.add_argument("-o", "--output", required=True, help="Path to output directory.")
+#     args = parser.parse_args()
+#     main(args.input, args.output)
+
+#-----------------------------------------------------------------------
+
+#!/usr/bin/env python3
 import argparse
 import os
 import json
 import joblib
 
 def load_dataset(responses_file):
-    """Load TIRA test input JSONL (id + response)."""
     ids, texts = [], []
     with open(responses_file, 'r', encoding='utf-8') as f:
         for line in f:
@@ -100,48 +175,30 @@ def find_test_file(input_dir):
     raise FileNotFoundError(f"No input.jsonl found under {input_dir}")
 
 def main(input_dir, output_dir):
-# 1) Locate TIRA’s test file anywhere under input_dir
+    # 1) Locate test file
     test_path = find_test_file(input_dir)
     print(f"DEBUG: Using test file at {test_path}", flush=True)
 
+    # 2) Load data
     test_ids, test_texts = load_dataset(test_path)
 
-    # 2) Load model, predict, write output as before…
-    model = joblib.load("/model.pkl")
+    # 3) Load model & predict
+    model = joblib.load("model.pkl")
     preds = model.predict(test_texts)
 
+    # 4) Write predictions
     os.makedirs(output_dir, exist_ok=True)
     out_file = os.path.join(output_dir, 'predictions.jsonl')
     with open(out_file, 'w', encoding='utf-8') as fout:
         for _id, p in zip(test_ids, preds):
-            fout.write(json.dumps({"id": _id, "label": int(p), "tag": "Tf-IDF-logReg"}) + "\n")
+            fout.write(json.dumps({
+                "id":    _id,
+                "label": int(p),
+                "tag":   "Tf-IDF-logReg"
+            }) + "\n")
 
     print(f"✅ Wrote {out_file}", flush=True)
-    # # 1) Locate TIRA’s test file
-    # test_path = os.path.join(input_dir, 'input.jsonl')
-    # if not os.path.exists(test_path):
-    #     raise FileNotFoundError(f"No input.jsonl in {input_dir}")
 
-    # test_ids, test_texts = load_dataset(test_path)
-
-    # # 2) Load pre-trained model
-    # model = joblib.load("/model.pkl")
-
-    # # 3) Predict
-    # preds = model.predict(test_texts)
-
-    # # 4) Write TIRA’s required output
-    # os.makedirs(output_dir, exist_ok=True)
-    # out_file = os.path.join(output_dir, 'predictions.jsonl')
-    # with open(out_file, 'w', encoding='utf-8') as fout:
-    #     for _id, p in zip(test_ids, preds):
-    #         fout.write(json.dumps({
-    #             "id": _id,
-    #             "label": int(p),
-    #             "tag": "Tf-IDF-logReg"
-    #         }) + "\n")
-
-    # print(f"✅ Wrote {out_file}", flush=True)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -149,4 +206,3 @@ if __name__ == "__main__":
     parser.add_argument("-o", "--output", required=True, help="Path to output directory.")
     args = parser.parse_args()
     main(args.input, args.output)
-
