@@ -18,12 +18,32 @@ import json
     help='The file where predictions should be written to.'
 )
 def main(dataset, output):
+    print(f"DEBUG: Dataset = {dataset}", flush=True)
+
+    # Load input
     tira = Client()
     df = tira.pd.inputs(dataset)
+    print(f"DEBUG: Loaded {len(df)} rows from dataset", flush=True)
 
-    model = load(Path(__file__).parent / "model.pkl")
+    if df.empty:
+        print("❗ ERROR: No input data to predict on.", flush=True)
+        return
+
+    # Load model
+    model_path = Path(__file__).parent / "model.pkl"
+    print(f"DEBUG: Loading model from {model_path}", flush=True)
+
+    if not model_path.exists():
+        print("❗ ERROR: model.pkl not found!", flush=True)
+        return
+
+    model = load(model_path)
+
+    # Predict
     predictions = model.predict(df["response"])
+    print(f"DEBUG: Made predictions for {len(predictions)} rows", flush=True)
 
+    # Write output
     df["label"] = predictions
     df["tag"] = "Tf-IDF-logReg"
 
