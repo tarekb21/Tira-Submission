@@ -1,15 +1,11 @@
 FROM python:3.10-slim
 
-# copy in code + model
-COPY script.py       /app/script.py
-COPY artifacts/model.pkl /app/model.pkl
+# Install dependencies
 COPY requirements.txt /app/requirements.txt
+RUN pip install --no-cache-dir -r /app/requirements.txt
 
-WORKDIR /app
+# Copy prediction script and model
+COPY predict.py /predict.py
+COPY model.pkl /model.pkl
 
-# install runtime deps
-RUN pip install --no-cache-dir -r requirements.txt \
- && chmod +x script.py
-
-# now the container WILL run your script by default
-ENTRYPOINT ["python3", "script.py", "-i",  "$inputDataset", "-o", "$outputDir"]
+ENTRYPOINT ["/predict.py"]

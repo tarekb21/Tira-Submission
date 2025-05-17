@@ -1,5 +1,6 @@
-argparse
-numpy
 pandas
 scikit-learn==1.6.1
 joblib
+click
+tira>=0.0.159
+pyyaml
