@@ -1,35 +1,32 @@
 name: Upload Software to TIRA
-
 on:
-  workflow_dispatch:  # 👈 Enables manual "Run workflow" button
-
+  workflow_dispatch:
+    directory:
+      description: 'The directory that contains the submission. Can be . for the root of the repository'
+      required: true
+      default: .
 jobs:
-  upload:
+  docker-build:
     runs-on: ubuntu-latest
-
+    timeout-minutes: 45
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v3
-
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.10'
-
-    - name: Install TIRA
-      run: pip install tira
-
-    - name: Build Docker Image
-      run: |
-        docker build -t registry.webis.de/code-research/tira/tira-user-pirate-passau/tira-submission:0.0.1 -f Dockerfile .
-
-    - name: Push Docker image to TIRA
-      run: |
-        tira-run \
-          --input-dataset=advertisement-in-retrieval-augmented-generation-2025/ads-in-rag-task-2-classification-spot-check \
-          --image=registry.webis.de/code-research/tira/tira-user-pirate-passau/tira-submission:0.0.1 \
-          --push true \
-          --tira-client-token=${{ secrets.TIRA_CLIENT_TOKEN }} \
-          --skip-local-test
-
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Set up Dependencies
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.8
+      - name: Install required python packages
+        run: |
+          python -m pip install --upgrade pip
+          pip3 install tira
+      - name: Build, test, and upload image
+        run: |
+          tira-cli login --token ${{ secrets.TIRA_CLIENT_TOKEN }}
+          tira-cli verify-installation
+          tira-cli code-submission --path ${{ inputs.directory }} --task advertisement-in-retrieval-augmented-generation-2025 --dataset advertisement-in-retrieval-augmented-generation-2025/ads-in-rag-task-1-generation-spot-check-20250423_1-training
 
