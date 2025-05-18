@@ -28,5 +28,5 @@ jobs:
         run: |
           tira-cli login --token ${{ secrets.TIRA_CLIENT_TOKEN }}
           tira-cli verify-installation
-          tira-cli code-submission --path ${{ inputs.directory }} --task advertisement-in-retrieval-augmented-generation-2025 --dataset advertisement-in-retrieval-augmented-generation-2025/ads-in-rag-task-1-generation-spot-check-20250423_1-training
+          tira-cli code-submission --path ${{ inputs.directory }} --task advertisement-in-retrieval-augmented-generation-2025 --dataset ads-in-rag-task-2-classification-spot-check-20250423-training
 
