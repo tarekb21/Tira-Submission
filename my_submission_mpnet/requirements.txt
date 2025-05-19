@@ -1,8 +1,7 @@
-torch
-sentence-transformers
-scikit-learn==1.6.1
-pandas
-tqdm
 click
+pandas
 tira>=0.0.159
-pyyaml
+torch
+transformers
+sentence-transformers
+scikit-learn

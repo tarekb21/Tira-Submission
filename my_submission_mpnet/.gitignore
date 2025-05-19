@@ -1,0 +1,9 @@
+# Ignore full SentenceTransformer model directory
+models/all-mpnet-base-v2/
+
+# Or ignore just specific large files (e.g., model weights)
+MPnet-full_end_to_end_model.pt
+
+# Or any other binary artifacts
+*.pt
+*.safetensors
