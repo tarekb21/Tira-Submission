@@ -46,7 +46,7 @@ def main(dataset, output):
     model = FineTuningWrapper(sentence_model).to(device)
 
     # Load trained weights
-    model.load_state_dict(torch.load(Path(__file__).parent / "MPnet-full_end_to_end_model.pt", map_location=device))
+    model.load_state_dict(torch.load("/model/MPnet-full_end_to_end_model.pt", map_location=device))
     model.eval()
 
     tokenizer = sentence_model.tokenizer

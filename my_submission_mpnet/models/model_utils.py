@@ -18,7 +18,7 @@ class MPNetModel:
 
         # Load fine-tuned classifier on top
         self.model = FineTuningWrapper(model_name).to(self.device)
-        self.model.load_state_dict(T.load(MODEL_PATH / "MPnet-full_end_to_end_model.pt", map_location=self.device))
+        self.model.load_state_dict(T.load("/model/MPnet-full_end_to_end_model.pt", map_location=self.device))
         self.model.eval()
 
     def make_predictions(self):
