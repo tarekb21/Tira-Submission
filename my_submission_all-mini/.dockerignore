@@ -1,0 +1,22 @@
+# Byte-compiled / cache files
+__pycache__/
+*.py[cod]
+*.so
+
+# VSCode files
+.vscode/
+*.code-workspace
+
+# Git stuff
+.git
+.gitignore
+
+# Output and logs
+tira-output/
+*.log
+*.jsonl
+
+# System files
+.DS_Store
+.env
+
