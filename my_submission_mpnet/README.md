@@ -1,2 +1,2 @@
 
-tira-cli code-submission --mount-hf-model tarekb21/MPnet-finetune --task  advertisement-in-retrieval-augmented-generation-2025 --dataset ads-in-rag-task-2-classification-spot-check-20250423-training --path .
+tira-cli code-submission --mount-hf-model tarekb21/MPnet-finetune sentence-transformers/all-mpnet-base-v2 --task  advertisement-in-retrieval-augmented-generation-2025 --dataset ads-in-rag-task-2-classification-spot-check-20250423-training --command '/predict.py --model-dir /root/.cache/huggingface/hub/models--tarekb21--MPnet-finetune/snapshots/ebb614d79faf8cbfb4f1c1649adfbadf40f81261/MPnet-full_end_to_end_model.pt' --path .

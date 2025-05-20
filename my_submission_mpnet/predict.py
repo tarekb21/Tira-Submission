@@ -30,7 +30,12 @@ class FineTuningWrapper(nn.Module):
     default=str(Path(get_output_directory(__file__)) / "predictions.jsonl"),
     help='Output file'
 )
-def main(dataset, output):
+@click.option(
+    '--model-dir',
+    default=Path(__file__).parent / "models" / "MPnet-full_end_to_end_model.pt",
+    help='The model'
+)
+def main(dataset, output, model_dir):
     print(f"Running inference on dataset: {dataset}")
     output_path = Path(output)
 
@@ -41,12 +46,11 @@ def main(dataset, output):
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
     # Load model
-    model_dir = Path(__file__).parent / "models" / "all-mpnet-base-v2"
-    sentence_model = SentenceTransformer(str(model_dir))
+    sentence_model = SentenceTransformer("sentence-transformers/all-mpnet-base-v2")
     model = FineTuningWrapper(sentence_model).to(device)
 
     # Load trained weights
-    model.load_state_dict(torch.load("/model/MPnet-full_end_to_end_model.pt", map_location=device))
+    model.load_state_dict(torch.load(str(model_dir), map_location=device))
     model.eval()
 
     tokenizer = sentence_model.tokenizer

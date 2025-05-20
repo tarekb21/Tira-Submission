@@ -15,4 +15,4 @@ RUN chmod +x /predict.py
 
 # Set entrypoint for TIRA
 ENV PYTHONPATH=/
-ENTRYPOINT ["/predict.py"]
+#ENTRYPOINT ["/predict.py", "--model-dir", "/root/.cache/huggingface/hub/models--tarekb21--MPnet-finetune/snapshots/ebb614d79faf8cbfb4f1c1649adfbadf40f81261/MPnet-full_end_to_end_model.pt"]
