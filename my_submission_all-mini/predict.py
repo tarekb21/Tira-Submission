@@ -6,6 +6,7 @@ import click
 from tira.rest_api_client import Client
 from tira.third_party_integrations import get_output_directory
 from sentence_transformers import SentenceTransformer
+from huggingface_hub import hf_hub_download
 from torch import nn
 
 class FineTuningWrapper(nn.Module):
@@ -50,6 +51,7 @@ def main(dataset, output, model_dir):
     model = FineTuningWrapper(sentence_model).to(device)
 
     # Load trained weights
+    model_dir = hf_hub_download(model_dir, "All-mini-Lm-full_end_to_end_model.pt", local_files_only=True)
     model.load_state_dict(torch.load(str(model_dir), map_location=device))
     model.eval()
 
