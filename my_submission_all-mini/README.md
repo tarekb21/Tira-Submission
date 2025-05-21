@@ -1,0 +1,2 @@
+
+tira-cli code-submission --mount-hf-model sentence-transformers/all-MiniLM-L6-v2 tarekb21/All-Mini-LM-v2-FineTuned  --task  advertisement-in-retrieval-augmented-generation-2025 --dataset ads-in-rag-task-2-classification-spot-check-20250423-training --command '/predict.py --model-dir /root/.cache/huggingface/hub/models--tarekb21--All-Mini-LM-v2-FineTuned/snapshots/ca9cf90cb1f3948b092e589cb9572ccaefe12b72/All-mini-Lm-full_end_to_end_model.pt' --path .
