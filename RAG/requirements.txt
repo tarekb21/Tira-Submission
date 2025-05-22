@@ -1,0 +1,7 @@
+click
+pandas
+tira>=0.0.159
+torch
+transformers
+sentence-transformers
+scikit-learn
