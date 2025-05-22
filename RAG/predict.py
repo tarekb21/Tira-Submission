@@ -12,18 +12,24 @@ from itertools import chain
 import torch
 
 # Config
-EMBED_MODEL = "all-MiniLM-L6-v2"
+EMBED_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
 RERANKER_MODEL = "cross-encoder/ms-marco-MiniLM-L-6-v2"
-TINY_LLAMA_PATH = "TinyLlama/TinyLlama-1.1B-Chat-v1.0"
+LLM_MODEL = "TinyLlama/TinyLlama-1.1B-Chat-v1.0"
 K_PER_LABEL = 5
 FINAL_TOP_M = 4
 
 @click.command()
 @click.option('--dataset', required=True)
+@click.option('--embed-model', default=EMBED_MODEL)
+@click.option('--reranker-model', default=RERANKER_MODEL)
+@click.option('--llm-model', default=LLM_MODEL)
 @click.option('--output', default=Path(get_output_directory(str(Path(__file__).parent))) / "predictions.jsonl")
-def main(dataset, output):
+def main(dataset, output, embed_model, reranker_model, llm_model):
     print("▶️ Loading TIRA dataset...")
     tira = Client()
+    EMBED_MODEL = embed_model
+    RERANKER_MODEL = reranker_model
+    LLM_MODEL = llm_model
     df = tira.pd.inputs(dataset)
 
     print("▶️ Loading models and FAISS index...")
@@ -36,9 +42,9 @@ def main(dataset, output):
         for label, docs in label_dict.items():
             docs_by_topic_label[topic][label] = docs
 
-    embedder = SentenceTransformer(EMBED_MODEL)
-    reranker = CrossEncoder(RERANKER_MODEL)
-    llm_classifier = LocalLlamaClassifier(base_path / TINY_LLAMA_PATH)
+    embedder = SentenceTransformer(EMBED_MODEL, local_files_only=True)
+    reranker = CrossEncoder(RERANKER_MODEL, local_files_only=True)
+    llm_classifier = LocalLlamaClassifier(LLM_MODEL)
 
     print("▶️ Running RAG classification...")
     predictions = []
@@ -133,7 +139,7 @@ def classify_with_rag(response, topic, embedder, faiss_indices, docs_by_topic_la
 class LocalLlamaClassifier:
     def __init__(self, model_path):
         print(f"🔄 Loading TinyLlama model from {model_path}...")
-        self.tokenizer = AutoTokenizer.from_pretrained(model_path)
+        self.tokenizer = AutoTokenizer.from_pretrained(model_path, only_local_files=True)
         self.model = AutoModelForCausalLM.from_pretrained(model_path, torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32)
         self.generator = pipeline(
             "text-generation",

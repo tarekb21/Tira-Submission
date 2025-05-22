@@ -9,6 +9,5 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY predict.py ./
 COPY faiss_indices2.pkl ./
-COPY TinyLlama /app/TinyLlama/  
 
 ENTRYPOINT ["python", "predict.py"]
