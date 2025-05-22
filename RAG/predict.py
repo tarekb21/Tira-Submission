@@ -71,7 +71,7 @@ def main(dataset, output, embed_model, reranker_model, llm_model):
 # Add below in same file, or import from a separate module if cleaner
 
 def embed_query(text, embedder):
-    return embedder.encode([text], normalize_embeddings=True)
+    return embedder.encode([text], normalize_embeddings=True).astype(np.float32)  # ensure 2D + correct dtype
 
 def retrieve_by_label(query_emb, topic, faiss_indices, docs_by_topic_label, k=K_PER_LABEL):
     if topic in faiss_indices:
