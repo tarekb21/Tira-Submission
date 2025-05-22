@@ -1,7 +1,9 @@
-click
 pandas
 tira>=0.0.159
-torch
-transformers
-sentence-transformers
 scikit-learn
+click
+faiss-cpu
+tqdm
+sentence-transformers
+transformers
+torch

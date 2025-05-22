@@ -1,14 +1,14 @@
-FROM nvcr.io/nvidia/cuda:12.8.0-cudnn-devel-ubuntu24.04
+FROM python:3.10-slim
 
-# Install Python dependencies
-COPY requirements.txt /app/requirements.txt
-RUN apt-get update \
-	&& apt-get install -y python3-pip \
-	&& pip install --no-cache-dir --break-system-packages -r /app/requirements.txt
+RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
 
-RUN pip3 install --no-cache-dir faiss-cpu --break-system-packages
+WORKDIR /app
 
-# Copy your script only
-ADD RAG.py /
+COPY requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
 
-ENTRYPOINT ["/RAG.py"]
+COPY predict.py ./
+COPY faiss_indices2.pkl ./
+COPY TinyLlama /app/TinyLlama/  
+
+ENTRYPOINT ["python", "predict.py"]
