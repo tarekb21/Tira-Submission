@@ -77,7 +77,7 @@ def main(test_resp, test_labels, faiss_pkl, output, llm_path):
 
 # ─── RAG CLASSIFICATION ──────────────────────────────────────────────────
 def embed_query(text, embedder):
-    return embedder.encode([text], normalize_embeddings=True)
+    return embedder.encode([text], normalize_embeddings=True).astype(np.float32)
 
 def retrieve_by_label(query_emb, topic, faiss_indices, docs_by_topic_label, k=K_PER_LABEL):
     if topic in faiss_indices:
