@@ -39,12 +39,19 @@ def save_jsonl(path, items):
 def main(test_resp, test_labels, faiss_pkl, output, llm_path):
     print("▶️ Loading FAISS index and docs...")
     with open(faiss_pkl, "rb") as f:
-        faiss_indices, plain_docs = pickle.load(f)
+        docs_by_topic_label = pickle.load(f)  # only docs, not indices
 
-    docs_by_topic_label = defaultdict(lambda: defaultdict(list))
-    for topic, label_dict in plain_docs.items():
+    faiss_indices = {}
+    for topic, label_dict in docs_by_topic_label.items():
+        faiss_indices[topic] = {}
         for label, docs in label_dict.items():
-            docs_by_topic_label[topic][label] = docs
+            if not docs:
+                continue
+            embeddings = np.stack([doc['embedding'] for doc in docs]).astype(np.float32)
+            index = faiss.IndexFlatIP(embeddings.shape[1])
+            index.add(embeddings)
+            faiss_indices[topic][label] = index
+
 
     print("▶️ Loading embedder, reranker, and TinyLlama...")
     embedder = SentenceTransformer(EMBED_MODEL)
