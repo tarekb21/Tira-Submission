@@ -1,0 +1,5 @@
+click
+tira>=0.0.159
+sentence-transformers
+scikit-learn
+joblib
