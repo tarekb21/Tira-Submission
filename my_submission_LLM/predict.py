@@ -64,8 +64,7 @@ def main(response_file, label_file, model, api_key):
     data = load_data(response_file, label_file)
 
     # choose local vs OpenAI
-    use_local = hf_pipeline and os.path.isdir(model)
-    if use_local:
+    if not api_key:
         tok = AutoTokenizer.from_pretrained(model)
         lm  = AutoModelForCausalLM.from_pretrained(model)
         pipe = hf_pipeline("text-generation", model=lm, tokenizer=tok, trust_remote_code=True)
