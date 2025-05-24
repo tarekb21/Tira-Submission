@@ -8,13 +8,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends git && \
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Pre-download TinyLlama (adjust MODEL_ID as needed)
-ARG MODEL_ID=tinyllama --default-model
-RUN python3 - <<EOF
-from transformers import AutoTokenizer, AutoModelForCausalLM
-AutoTokenizer.from_pretrained("$MODEL_ID")
-AutoModelForCausalLM.from_pretrained("$MODEL_ID")
-EOF
+ENV HF_HUB_OFFLINE=1
 
 # Copy code
 COPY predict.py .
