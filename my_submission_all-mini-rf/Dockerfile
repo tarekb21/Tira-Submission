@@ -6,12 +6,7 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# 2) preload the transformer model into the cache
-RUN python3 - <<EOF
-from sentence_transformers import SentenceTransformer
-# This downloads all the files into /root/.cache during build
-SentenceTransformer("all-MiniLM-L6-v2")
-EOF
+ENV HF_HUB_OFFLINE=1
 
 # 3) copy your code and pretrained RF
 COPY train_rf.py predict.py ./
