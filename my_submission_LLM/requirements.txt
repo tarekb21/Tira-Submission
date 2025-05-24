@@ -1,0 +1,8 @@
+click
+openai
+scikit-learn
+numpy
+transformers
+tinyllama
+torch
+
