@@ -4,6 +4,8 @@ import json
 import click
 from sklearn.metrics import classification_report, confusion_matrix
 import numpy as np
+from glob import glob
+import pandas as pd
 
 # Optional HF pipeline for local models
 try:
@@ -59,17 +61,12 @@ def query_local(pipe, text):
 
 def load_inputs(dataset_path):
     if os.path.isdir(dataset_path):
-        file_path = os.path.join(dataset_path, "responses-test.jsonl")
-    else:
-        file_path = dataset_path
-    if not os.path.isfile(file_path):
-        raise FileNotFoundError(f"Input file not found: {file_path}")
-    items = []
-    with open(file_path, 'r', encoding='utf-8') as f:
-        for line in f:
-            obj = json.loads(line)
-            items.append({"id": obj.get("id"), "text": obj.get("response")})
-    return items
+        dataset_path = glob(f"{dataset_path}/*.jsonl*")
+        assert len(dataset_path) == 1
+        dataset_path = dataset_path[0]
+
+    ret = pd.read_json(dataset_path, lines=True)
+    return [{"id": i["id"], "text": i["response"]} for _, i in ret.iterrows()]
 
 @click.command()
 @click.option("--dataset",  required=True, help="Path to dataset dir or JSONL file.")
@@ -87,7 +84,7 @@ def main(dataset, output, model, api_key, base_url):
     data = load_inputs(dataset)
 
     # Setup model
-    use_local = (hf_pipeline is not None) and os.path.isdir(model)
+    use_local = ((hf_pipeline is not None) and os.path.isdir(model)) or str(base_url).lower() == "none"
     client = None
     pipe = None
     if use_local:
